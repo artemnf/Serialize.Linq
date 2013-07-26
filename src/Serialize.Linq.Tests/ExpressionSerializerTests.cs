@@ -1,4 +1,12 @@
-﻿using System;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -226,7 +234,7 @@ namespace Serialize.Linq.Tests
 
         private static IEnumerable<IBinarySerializer> CreateBinarySerializers()
         {
-            return new IBinarySerializer[] { new BinarySerializer() };
+            return new IBinarySerializer[] { new BinarySerializer(), new BinarayFormatterSerializer()  };
         }
     }
 }

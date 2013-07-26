@@ -1,4 +1,12 @@
-﻿using System;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,9 +17,16 @@ namespace Serialize.Linq.Nodes
 {
     #region DataContract
 #if !SERIALIZE_LINQ_OPTIMIZE_SIZE
+    #if SERIALIZE_LINQ_BORKED_VERION
     [DataContract]
+    #else
+    [DataContract(Name = "MemberNodeGeneric")]
+    #endif
 #else
     [DataContract(Name = "MN")]
+#endif
+#if !SILVERLIGHT
+    [Serializable]
 #endif
     #endregion
     public abstract class MemberNode<TMemberInfo> : Node where TMemberInfo : MemberInfo

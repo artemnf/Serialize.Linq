@@ -1,9 +1,19 @@
-﻿using System.Linq;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+#if !WINDOWS_PHONE7
+using System;
+#endif
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Extensions;
 using Serialize.Linq.Interfaces;
-using Serialize.Linq.Internals;
 
 namespace Serialize.Linq.Nodes
 {
@@ -12,6 +22,9 @@ namespace Serialize.Linq.Nodes
     [DataContract]
 #else
     [DataContract(Name = "L")]
+#endif
+#if !SILVERLIGHT
+    [Serializable]
 #endif
     #endregion
     public class LambdaExpressionNode : ExpressionNode<LambdaExpression>
@@ -41,8 +54,12 @@ namespace Serialize.Linq.Nodes
 
         protected override void Initialize(LambdaExpression expression)
         {
+#if !WINDOWS_PHONE7
             this.Parameters = new ExpressionNodeList(this.Factory, expression.Parameters);
-            this.Body = this.Factory.Create(expression.Body);            
+#else
+            this.Parameters = new ExpressionNodeList(this.Factory, expression.Parameters.Select(p => (Expression)p));
+#endif
+            this.Body = this.Factory.Create(expression.Body);
         }
 
         public override Expression ToExpression(ExpressionContext context)

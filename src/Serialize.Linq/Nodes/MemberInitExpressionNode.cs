@@ -1,7 +1,15 @@
-﻿using System.Linq.Expressions;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+using System;
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
-using Serialize.Linq.Internals;
 
 namespace Serialize.Linq.Nodes
 {
@@ -10,6 +18,9 @@ namespace Serialize.Linq.Nodes
     [DataContract]
 #else
     [DataContract(Name = "MIE")]
+#endif
+#if !SILVERLIGHT
+    [Serializable]
 #endif
     #endregion
     public class MemberInitExpressionNode : ExpressionNode<MemberInitExpression>
