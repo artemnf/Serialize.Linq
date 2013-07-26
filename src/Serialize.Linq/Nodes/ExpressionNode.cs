@@ -1,4 +1,12 @@
-﻿using System;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+using System;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
@@ -6,14 +14,17 @@ using Serialize.Linq.Interfaces;
 namespace Serialize.Linq.Nodes
 {
     #region DataContract
-#if !SERIALIZE_LINQ_OPTIMIZE_SIZE
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="TExpression">The type of the expression.</typeparam>
+#if !SERIALIZE_LINQ_OPTIMIZE_SIZE    
+    #if SERIALIZE_LINQ_BORKED_VERION
     [DataContract]
+    #else
+    [DataContract(Name = "ExpressionNodeGeneric")]
+    #endif
 #else
     [DataContract(Name = "tE")]    
+#endif
+#if !SILVERLIGHT
+    [Serializable]
 #endif
     #endregion
     public abstract class ExpressionNode<TExpression> : ExpressionNode where TExpression : Expression
@@ -58,6 +69,9 @@ namespace Serialize.Linq.Nodes
     [DataContract]
 #else
     [DataContract(Name = "E")]
+#endif
+#if !SILVERLIGHT
+    [Serializable]
 #endif
     #endregion
     public abstract class ExpressionNode : Node
@@ -126,10 +140,11 @@ namespace Serialize.Linq.Nodes
         /// Converts this instance to an expression.
         /// </summary>
         /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <param name="context">The context.</param>
         /// <returns></returns>
-        public Expression<TDelegate> ToExpression<TDelegate>()
+        public Expression<TDelegate> ToExpression<TDelegate>(ExpressionContext context = null)
         {
-            return this.ToExpression<TDelegate>(ConvertToExpression<TDelegate>);
+            return this.ToExpression<TDelegate>(ConvertToExpression<TDelegate>, context ?? new ExpressionContext());
         }
 
         /// <summary>
@@ -144,6 +159,26 @@ namespace Serialize.Linq.Nodes
             if (conversionFunction == null)
                 throw new ArgumentNullException("conversionFunction");
             return conversionFunction(this);
+        }
+
+        /// <summary>
+        /// Converts this instance to an expression.
+        /// </summary>
+        /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
+        /// <param name="conversionFunction">The conversion function.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// Parameter <paramref name="conversionFunction"/> or <paramref name="context"/> is null.
+        /// </exception>
+        public Expression<TDelegate> ToExpression<TDelegate>(
+            Func<ExpressionNode, ExpressionContext, Expression<TDelegate>> conversionFunction, ExpressionContext context)
+        {
+            if (conversionFunction == null)
+                throw new ArgumentNullException("conversionFunction");
+            if (context == null)
+                throw new ArgumentNullException("context");
+            return conversionFunction(this, context);
         }
 
         /// <summary>
@@ -162,10 +197,11 @@ namespace Serialize.Linq.Nodes
         /// </summary>
         /// <typeparam name="TDelegate">The type of the delegate.</typeparam>
         /// <param name="expressionNode">The expression node.</param>
+        /// <param name="context">The context.</param>
         /// <returns></returns>
-        private static Expression<TDelegate> ConvertToExpression<TDelegate>(ExpressionNode expressionNode)
+        private static Expression<TDelegate> ConvertToExpression<TDelegate>(ExpressionNode expressionNode, ExpressionContext context)
         {
-            var expression = expressionNode.ToExpression();
+            var expression = expressionNode.ToExpression(context);
             return (Expression<TDelegate>)expression;
         }
     }

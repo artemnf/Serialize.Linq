@@ -1,7 +1,17 @@
-﻿using System.Linq.Expressions;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+#if !WINDOWS_PHONE7
+using System;
+#endif
+using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using Serialize.Linq.Interfaces;
-using Serialize.Linq.Internals;
 
 namespace Serialize.Linq.Nodes
 {
@@ -11,9 +21,12 @@ namespace Serialize.Linq.Nodes
 #else
     [DataContract(Name = "P")]
 #endif
+#if !SILVERLIGHT
+    [Serializable]
+#endif
     #endregion
     public class ParameterExpressionNode : ExpressionNode<ParameterExpression>
-    {   
+    {
         public ParameterExpressionNode() { }
 
         public ParameterExpressionNode(INodeFactory factory, ParameterExpression expression)
@@ -26,7 +39,7 @@ namespace Serialize.Linq.Nodes
         [DataMember(EmitDefaultValue = false, Name = "I")]
 #endif
 
-            #endregion
+        #endregion
         public bool IsByRef { get; set; }
 
         #region DataMember
@@ -40,8 +53,12 @@ namespace Serialize.Linq.Nodes
 
         protected override void Initialize(ParameterExpression expression)
         {
+#if !WINDOWS_PHONE7
             this.IsByRef = expression.IsByRef;
-            this.Name = expression.Name;            
+#else
+            this.IsByRef = false;
+#endif
+            this.Name = expression.Name;
         }
 
         public override Expression ToExpression(ExpressionContext context)

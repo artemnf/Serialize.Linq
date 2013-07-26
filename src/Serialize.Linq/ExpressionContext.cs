@@ -1,5 +1,17 @@
-﻿using System;
+﻿#region Copyright
+//  Copyright, Sascha Kiefer (esskar)
+//  Released under LGPL License.
+//  
+//  License: https://raw.github.com/esskar/Serialize.Linq/master/LICENSE
+//  Contributing: https://github.com/esskar/Serialize.Linq
+#endregion
+
+using System;
+#if !WINDOWS_PHONE
 using System.Collections.Concurrent;
+#else
+using Serialize.Linq.Internals;
+#endif
 using System.Linq.Expressions;
 using Serialize.Linq.Nodes;
 
